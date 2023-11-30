@@ -21,7 +21,6 @@ export type OrganizationType = {
 };
 
 interface NavItemProps {
-  key: string;
   isActive: boolean;
   isExpanded: boolean;
   organization: OrganizationType;
@@ -31,7 +30,6 @@ interface NavItemProps {
 export const NavItem = ({
   isActive,
   isExpanded,
-  key,
   onExpand,
   organization,
 }: NavItemProps) => {
