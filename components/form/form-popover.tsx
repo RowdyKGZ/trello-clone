@@ -12,7 +12,6 @@ import {
   PopoverClose,
 } from "@/components/ui/popover";
 import { useAction } from "@/hooks/use-action";
-import { CreateBoard } from "@/actions/create-board/schema";
 import { Button } from "@/components/ui/button";
 import { createBoard } from "@/actions/create-board";
 
