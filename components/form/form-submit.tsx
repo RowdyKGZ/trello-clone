@@ -8,7 +8,7 @@ import { Button } from "../ui/button";
 
 interface FormSubmitProps {
   children: React.ReactNode;
-  disabled?: Boolean;
+  disabled?: boolean;
   className?: string;
   variant?:
     | "default"
@@ -24,7 +24,7 @@ export const FormSubmit = ({
   children,
   className,
   disabled,
-  variant,
+  variant = "primary",
 }: FormSubmitProps) => {
   const { pending } = useFormStatus();
 
