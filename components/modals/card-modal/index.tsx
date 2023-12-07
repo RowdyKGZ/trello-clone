@@ -6,10 +6,12 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { CardWitchList } from "@/types";
 import { fetcher } from "@/lib/fetcher";
+import { AuditLog } from "@prisma/client";
 
 import { Header } from "./header";
 import { Description } from "./description";
 import { Actions } from "./actions";
+import { Activity } from "./activity";
 
 export const CardModal = () => {
   const id = useCardModal((state) => state.id);
@@ -20,6 +22,13 @@ export const CardModal = () => {
     queryKey: ["card", id],
     queryFn: () => fetcher(`/api/cards/${id}`),
   });
+
+  const { data: auditLogsData } = useQuery<AuditLog[]>({
+    queryKey: ["card-logs", id],
+    queryFn: () => fetcher(`/api/cards/${id}/logs`),
+  });
+
+  console.log(auditLogsData);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -34,8 +43,15 @@ export const CardModal = () => {
               ) : (
                 <Description data={cardData} />
               )}
+
+              {!auditLogsData ? (
+                <Activity.Skeleton />
+              ) : (
+                <Activity items={auditLogsData} />
+              )}
             </div>
           </div>
+
           {!cardData ? <Actions.Skeleton /> : <Actions data={cardData} />}
         </div>
       </DialogContent>

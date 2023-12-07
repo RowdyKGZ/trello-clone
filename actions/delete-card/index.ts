@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { auth } from "@clerk/nextjs";
 
 import { db } from "@/lib/db";
+import { createAuditLog } from "@/lib/create-audit-log";
 import { createSafeAction } from "@/lib/create-safe-actions";
 
 import { InputType, ReturnType } from "./types";
@@ -24,6 +26,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
 
   try {
     card = await db.card.delete({ where: { id, list: { board: { orgId } } } });
+
+    await createAuditLog({
+      entityTitle: card.title,
+      entityId: card.id,
+      entityType: ENTITY_TYPE.CARD,
+      action: ACTION.DELETE,
+    });
   } catch (error) {
     return {
       error: "Error copy delete",
