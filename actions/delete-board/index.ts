@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { decreaseAvailableCount } from "@/lib/org-limit";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { createSafeAction } from "@/lib/create-safe-actions";
+import { checkSubcription } from "@/lib/subscription";
 
 import { InputType, ReturnType } from "./types";
 import { DeleteBoard } from "./schema";
@@ -22,8 +23,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { id } = data;
+  const isPro = await checkSubcription();
 
+  const { id } = data;
   let board;
 
   try {
@@ -34,7 +36,9 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       },
     });
 
-    await decreaseAvailableCount();
+    if (!isPro) {
+      await decreaseAvailableCount();
+    }
 
     await createAuditLog({
       entityTitle: board.title,
