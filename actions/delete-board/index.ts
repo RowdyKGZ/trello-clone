@@ -3,14 +3,15 @@
 import { revalidatePath } from "next/cache";
 import { ACTION, ENTITY_TYPE } from "@prisma/client";
 import { auth } from "@clerk/nextjs";
+import { redirect } from "next/navigation";
 
 import { db } from "@/lib/db";
+import { decreaseAvailableCount } from "@/lib/org-limit";
 import { createAuditLog } from "@/lib/create-audit-log";
 import { createSafeAction } from "@/lib/create-safe-actions";
 
 import { InputType, ReturnType } from "./types";
 import { DeleteBoard } from "./schema";
-import { redirect } from "next/navigation";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
   const { userId, orgId } = auth();
@@ -32,6 +33,8 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         orgId,
       },
     });
+
+    await decreaseAvailableCount();
 
     await createAuditLog({
       entityTitle: board.title,

@@ -11,6 +11,7 @@ import { createAuditLog } from "@/lib/create-audit-log";
 
 import { InputType, RetunrType } from "./types";
 import { CreateBoard } from "./schema";
+import { incrementAvailableCount, hasAvailableCount } from "@/lib/org-limit";
 
 const handler = async (data: InputType): Promise<RetunrType> => {
   const { userId, orgId } = auth();
@@ -18,6 +19,15 @@ const handler = async (data: InputType): Promise<RetunrType> => {
   if (!userId || !orgId) {
     return {
       error: "Unauthorized",
+    };
+  }
+
+  const canCreate = await hasAvailableCount();
+
+  if (!canCreate) {
+    return {
+      error:
+        "You have reached your limit of free boards. Please upgrade to create more",
     };
   }
 
@@ -52,6 +62,8 @@ const handler = async (data: InputType): Promise<RetunrType> => {
         imageUserName,
       },
     });
+
+    await incrementAvailableCount();
 
     await createAuditLog({
       entityTitle: board.title,
